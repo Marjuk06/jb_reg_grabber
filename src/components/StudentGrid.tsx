@@ -14,37 +14,45 @@ interface StudentGridProps {
 export default function StudentGrid({ data, searchQuery, isHighlightMode, onStudentClick, hasData }: StudentGridProps) {
   const [cols, setCols] = useState<number>(3);
   const [highlightedRegNos, setHighlightedRegNos] = useState<string[]>([]);
-  const itemsPerLoad = typeof window !== 'undefined' && window.innerWidth < 768 ? 8 : 24;
-  const [visibleCount, setVisibleCount] = useState<number>(itemsPerLoad);
   
   const scrollContainerRef = React.useRef<HTMLDivElement>(null);
   const [showScrollTop, setShowScrollTop] = useState(false);
 
   const handleScroll = (e: React.UIEvent<HTMLDivElement>) => {
-    if (e.currentTarget.scrollTop > 500) {
+    if (e.currentTarget.scrollTop > 300) {
       setShowScrollTop(true);
-    } else if (window.scrollY <= 500) {
+    } else {
       setShowScrollTop(false);
     }
   };
 
   useEffect(() => {
-    const handleWindowScroll = () => {
-      if (window.scrollY > 500) {
+    const handleGlobalScroll = (e: any) => {
+      let scrollY = 0;
+      if (e.target && typeof e.target.scrollTop === 'number') {
+        scrollY = e.target.scrollTop;
+      } else {
+        scrollY = window.scrollY || document.documentElement.scrollTop || 0;
+      }
+      
+      if (scrollY > 300) {
         setShowScrollTop(true);
-      } else if (!scrollContainerRef.current || scrollContainerRef.current.scrollTop <= 500) {
+      } else if (!scrollContainerRef.current || scrollContainerRef.current.scrollTop <= 300) {
         setShowScrollTop(false);
       }
     };
-    window.addEventListener('scroll', handleWindowScroll);
-    return () => window.removeEventListener('scroll', handleWindowScroll);
+    
+    window.addEventListener('scroll', handleGlobalScroll, true);
+    return () => window.removeEventListener('scroll', handleGlobalScroll, true);
   }, []);
 
   const scrollToTop = () => {
-    if (scrollContainerRef.current && scrollContainerRef.current.scrollTop > 0) {
+    if (scrollContainerRef.current) {
       scrollContainerRef.current.scrollTo({ top: 0, behavior: 'smooth' });
     }
     window.scrollTo({ top: 0, behavior: 'smooth' });
+    document.documentElement.scrollTo({ top: 0, behavior: 'smooth' });
+    document.body.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
   // Resize listener for mobile fallback
@@ -75,11 +83,6 @@ export default function StudentGrid({ data, searchQuery, isHighlightMode, onStud
         const matchRegNos = matches.map(m => m.regNo);
         setHighlightedRegNos(matchRegNos);
         
-        // Find first match index to ensure it's rendered
-        const firstMatchIndex = data.findIndex(d => d.regNo === matchRegNos[0]);
-        if (firstMatchIndex !== -1 && firstMatchIndex >= visibleCount) {
-          setVisibleCount(firstMatchIndex + itemsPerLoad);
-        }
       } else {
         setHighlightedRegNos([]);
       }
@@ -100,18 +103,6 @@ export default function StudentGrid({ data, searchQuery, isHighlightMode, onStud
       }, 100);
     }
   }, [highlightedRegNos]);
-
-  // Infinite Scroll Observer
-  const observer = React.useRef<IntersectionObserver | null>(null);
-  const lastElementRef = React.useCallback((node: HTMLDivElement | null) => {
-    if (observer.current) observer.current.disconnect();
-    observer.current = new IntersectionObserver(entries => {
-      if (entries[0].isIntersecting && visibleCount < data.length) {
-        setVisibleCount(prev => prev + itemsPerLoad);
-      }
-    });
-    if (node) observer.current.observe(node);
-  }, [visibleCount, data.length, itemsPerLoad]);
 
   const gridColsClass = cols === 1 ? 'md:grid-cols-1' : 
                         cols === 2 ? 'md:grid-cols-2' : 
@@ -161,15 +152,13 @@ export default function StudentGrid({ data, searchQuery, isHighlightMode, onStud
           </div>
         ) : (
           <>
-            {data.slice(0, visibleCount).map((student, index) => {
-              const isLast = index === visibleCount - 1;
+            {data.map((student, index) => {
               return (
                 <div 
                   key={student.regNo || index} 
                   id={`student-${student.regNo}`}
-                  ref={isLast ? lastElementRef : null}
                   className="animate-slide-up opacity-0"
-                  style={{ animationDelay: `${Math.min((index % itemsPerLoad) * 0.05, 1)}s` }}
+                  style={{ animationDelay: `${Math.min((index % 24) * 0.05, 1)}s` }}
                 >
                   <StudentCard 
                     student={student} 
