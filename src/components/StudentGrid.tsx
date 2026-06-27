@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from 'react';
+import { createPortal } from 'react-dom';
 import { ArrowUp } from 'lucide-react';
 import { StudentData } from './types';
 import StudentCard from './StudentCard';
@@ -17,42 +18,38 @@ export default function StudentGrid({ data, searchQuery, isHighlightMode, onStud
   
   const scrollContainerRef = React.useRef<HTMLDivElement>(null);
   const [showScrollTop, setShowScrollTop] = useState(false);
+  const [isFlying, setIsFlying] = useState(false);
 
   const handleScroll = (e: React.UIEvent<HTMLDivElement>) => {
-    if (e.currentTarget.scrollTop > 300) {
+    if (e.currentTarget.scrollTop > 50) {
       setShowScrollTop(true);
-    } else {
+    } else if (window.scrollY <= 50) {
       setShowScrollTop(false);
     }
   };
 
   useEffect(() => {
-    const handleGlobalScroll = (e: any) => {
-      let scrollY = 0;
-      if (e.target && typeof e.target.scrollTop === 'number') {
-        scrollY = e.target.scrollTop;
-      } else {
-        scrollY = window.scrollY || document.documentElement.scrollTop || 0;
-      }
-      
-      if (scrollY > 300) {
+    const handleWindowScroll = () => {
+      if (window.scrollY > 50) {
         setShowScrollTop(true);
-      } else if (!scrollContainerRef.current || scrollContainerRef.current.scrollTop <= 300) {
+      } else if (!scrollContainerRef.current || scrollContainerRef.current.scrollTop <= 50) {
         setShowScrollTop(false);
       }
     };
     
-    window.addEventListener('scroll', handleGlobalScroll, true);
-    return () => window.removeEventListener('scroll', handleGlobalScroll, true);
+    window.addEventListener('scroll', handleWindowScroll);
+    return () => window.removeEventListener('scroll', handleWindowScroll);
   }, []);
 
   const scrollToTop = () => {
+    setIsFlying(true);
     if (scrollContainerRef.current) {
       scrollContainerRef.current.scrollTo({ top: 0, behavior: 'smooth' });
     }
     window.scrollTo({ top: 0, behavior: 'smooth' });
     document.documentElement.scrollTo({ top: 0, behavior: 'smooth' });
     document.body.scrollTo({ top: 0, behavior: 'smooth' });
+    setTimeout(() => setIsFlying(false), 1000);
   };
 
   // Resize listener for mobile fallback
@@ -173,14 +170,15 @@ export default function StudentGrid({ data, searchQuery, isHighlightMode, onStud
         )}
       </div>
 
-      {showScrollTop && (
+      {showScrollTop && typeof document !== 'undefined' && createPortal(
         <button 
           onClick={scrollToTop}
           title="Scroll to Top"
-          className="fixed bottom-6 right-6 z-[60] bg-emerald-500/90 hover:bg-emerald-400 text-black p-3 rounded-full shadow-[0_0_20px_rgba(16,185,129,0.5)] transition-all animate-fade-in hover:scale-110 border border-emerald-300"
+          className="group fixed bottom-6 right-6 z-[60] bg-black/40 backdrop-blur-md border border-emerald-500/40 hover:bg-emerald-500/20 text-emerald-400 p-3 rounded-full shadow-[0_0_15px_rgba(16,185,129,0.3)] transition-all animate-fade-in hover:shadow-[0_0_25px_rgba(16,185,129,0.5)]"
         >
-          <ArrowUp size={24} />
-        </button>
+          <ArrowUp size={24} className={isFlying ? 'animate-fly-fast' : 'transition-transform duration-300 group-hover:-translate-y-1'} />
+        </button>,
+        document.body
       )}
     </div>
   );

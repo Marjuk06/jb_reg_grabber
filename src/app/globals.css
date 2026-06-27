@@ -51,6 +51,19 @@
   to { opacity: 1; transform: scale(1); }
 }
 
+@keyframes flight {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-6px); }
+}
+
+.animate-flight {
+  animation: flight 1.5s ease-in-out infinite;
+}
+
+.animate-fly-fast {
+  animation: flight 0.4s ease-in-out infinite;
+}
+
 .animate-fade-in {
   opacity: 0;
   animation: fade-in 0.7s cubic-bezier(0.16, 1, 0.3, 1) forwards;
