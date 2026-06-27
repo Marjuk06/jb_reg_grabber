@@ -14,7 +14,6 @@ export default function StudentGrid({ data, searchQuery, isHighlightMode, onStud
   const [cols, setCols] = useState<number>(3);
   const [highlightedRegNo, setHighlightedRegNo] = useState<string | null>(null);
 
-  // Resize listener for mobile fallback
   useEffect(() => {
     const handleResize = () => {
       if (window.innerWidth < 768) {
@@ -26,7 +25,6 @@ export default function StudentGrid({ data, searchQuery, isHighlightMode, onStud
     return () => window.removeEventListener('resize', handleResize);
   }, []);
 
-  // Handle Search Highlighting
   useEffect(() => {
     if (isHighlightMode && searchQuery) {
       const q = searchQuery.toLowerCase();
@@ -47,7 +45,6 @@ export default function StudentGrid({ data, searchQuery, isHighlightMode, onStud
     }
   }, [searchQuery, isHighlightMode, data]);
 
-  // Scroll to highlighted element
   useEffect(() => {
     if (highlightedRegNo) {
       const el = document.getElementById(`student-${highlightedRegNo}`);
@@ -66,7 +63,6 @@ export default function StudentGrid({ data, searchQuery, isHighlightMode, onStud
   return (
     <div className="bg-black/60 backdrop-blur-2xl border border-blue-600/25 rounded-2xl shadow-2xl p-4 flex-grow flex flex-col overflow-hidden relative gap-4">
       
-      {/* Layout Controls */}
       <div className="hidden md:flex justify-between items-center bg-black/40 border border-emerald-500/20 rounded-xl p-2 px-4 shrink-0 shadow-inner">
         <span className="text-[10px] text-emerald-500/60 font-bold uppercase tracking-widest">Layout View</span>
         <div className="flex items-center gap-1">

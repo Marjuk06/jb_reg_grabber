@@ -7,5 +7,4 @@ if (!supabaseUrl || !supabaseKey) {
   console.error("Missing Supabase environment variables!");
 }
 
-// Create a single supabase client for interacting with your database
 export const supabase = createClient(supabaseUrl, supabaseKey);

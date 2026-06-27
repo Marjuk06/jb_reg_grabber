@@ -31,7 +31,6 @@ export default function SidebarControls(props: SidebarControlsProps) {
   return (
     <div className="bg-black/60 backdrop-blur-2xl border border-blue-600/25 rounded-2xl shadow-2xl p-4 lg:p-5 flex flex-col gap-5 shrink-0 w-full lg:w-[320px] lg:overflow-y-auto sticky top-4 z-40 max-h-[90vh]">
       
-      {/* Search and Mobile Toggle Header */}
       <div className="flex flex-col gap-3">
         <input 
           type="text" 
@@ -50,10 +49,8 @@ export default function SidebarControls(props: SidebarControlsProps) {
         </button>
       </div>
 
-      {/* Expandable Content */}
       <div className={`${isExpanded ? 'flex' : 'hidden'} lg:flex flex-col gap-5 flex-grow`}>
 
-      {/* Sorting */}
       <div className="flex flex-col gap-2">
         <span className="text-[10px] uppercase tracking-widest text-emerald-500/60 font-bold ml-1">Sort By</span>
         <div className="grid grid-cols-2 gap-2">
@@ -63,7 +60,6 @@ export default function SidebarControls(props: SidebarControlsProps) {
         </div>
       </div>
 
-      {/* Filters */}
       <div className="flex flex-col gap-2">
         <span className="text-[10px] uppercase tracking-widest text-emerald-500/60 font-bold ml-1">Filter Gender</span>
         <div className="grid grid-cols-2 gap-2">
@@ -79,7 +75,6 @@ export default function SidebarControls(props: SidebarControlsProps) {
         </div>
       </div>
 
-      {/* Stats & Actions */}
       <div className="mt-auto flex flex-col gap-3 pt-4 border-t border-emerald-500/20">
         <div className="flex justify-between items-center text-sm px-1">
           <span className="text-emerald-500/70 text-[10px] tracking-widest font-bold">Showing Records:</span>

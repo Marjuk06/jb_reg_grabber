@@ -10,7 +10,6 @@ interface DatabaseSyncSectionProps {
 export default function DatabaseSyncSection({ onSync, isLoading, progress }: DatabaseSyncSectionProps) {
   return (
     <div className="bg-black/60 backdrop-blur-2xl border border-blue-600/25 rounded-2xl shadow-2xl p-5 flex flex-col md:flex-row gap-4 shrink-0 justify-between items-center relative overflow-hidden">
-      {/* Progress Bar Background */}
       {isLoading && (
         <div 
           className="absolute left-0 top-0 h-full bg-emerald-500/10 transition-all duration-300 ease-out z-0"

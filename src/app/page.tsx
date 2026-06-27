@@ -30,12 +30,11 @@ export default function Dashboard() {
   const handleLoadFromDB = async () => {
     setIsLoadingDB(true);
     setSyncProgress(0);
-    setBaseData([]); // Clear previous data so it doesn't show during loading
+    setBaseData([]);
     
-    // Simulate a heavy data sync process with a fake progress interval
     const progressInterval = setInterval(() => {
       setSyncProgress(prev => {
-        if (prev >= 95) return 95; // Hold at 95% until real fetch completes
+        if (prev >= 95) return 95;
         return prev + Math.random() * 15;
       });
     }, 200);
@@ -44,14 +43,13 @@ export default function Dashboard() {
       const { data, error } = await supabase
         .from('students')
         .select('*')
-        .order('board_roll', { ascending: true }); // Default sort
+        .order('board_roll', { ascending: true });
 
       if (error) throw error;
       
       clearInterval(progressInterval);
       setSyncProgress(100);
 
-      // Add a tiny delay at 100% so the user sees the progress bar complete before it snaps away
       setTimeout(() => {
         if (data && data.length > 0) {
           const mappedData: StudentData[] = data.map(d => ({
@@ -101,7 +99,6 @@ export default function Dashboard() {
 
 
 
-  // Apply Sort and Filters
   const filteredData = useMemo(() => {
     let filtered = [...baseData];
 
@@ -155,7 +152,6 @@ export default function Dashboard() {
     return filtered;
   }, [baseData, genderFilter, groupFilter, currentSort]);
 
-  // The grid handles highlight mode automatically
   const displayData = filteredData;
 
   const handleExport = () => {
@@ -215,7 +211,7 @@ export default function Dashboard() {
         <StudentGrid 
           data={displayData} 
           searchQuery={searchQuery}
-          isHighlightMode={true} // Hardcode to true to match old behavior
+          isHighlightMode={true}
           onStudentClick={(idx) => {
             setCurrentStudentIndex(idx);
             setModalOpen(true);
