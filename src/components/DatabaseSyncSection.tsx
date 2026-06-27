@@ -11,8 +11,23 @@ interface DatabaseSyncSectionProps {
 }
 
 export default function DatabaseSyncSection({ onSync, isLoading, progress, hasData }: DatabaseSyncSectionProps) {
+  const loadingStrings = [
+    "Establishing secure link...",
+    "Bypassing firewall...",
+    "Connecting to Jessore Board...",
+    "Authenticating credentials...",
+    "Accessing central database...",
+    "Downloading student records...",
+    "Decrypting payload...",
+    "Finalizing sync..."
+  ];
+  
+  // Prevent index out of bounds if progress is exactly 100
+  const loadingIndex = Math.min(Math.floor((progress / 100) * loadingStrings.length), loadingStrings.length - 1);
+  const loadingText = loadingStrings[loadingIndex >= 0 ? loadingIndex : 0];
+
   return (
-    <div className="bg-black/60 backdrop-blur-2xl border border-blue-600/25 rounded-2xl shadow-2xl p-5 flex flex-col md:flex-row gap-4 shrink-0 justify-between items-center relative overflow-hidden">
+    <div className="bg-[#050b14] md:bg-black/60 md:backdrop-blur-2xl border border-blue-600/25 rounded-2xl md:shadow-2xl p-5 flex flex-col md:flex-row gap-4 shrink-0 justify-between items-center relative overflow-hidden">
       {isLoading && (
         <div 
           className="absolute left-0 top-0 h-full bg-emerald-500/10 transition-all duration-300 ease-out z-0"
@@ -34,38 +49,28 @@ export default function DatabaseSyncSection({ onSync, isLoading, progress, hasDa
         </p>
       </div>
 
-      <div className="flex items-center gap-4 w-full md:w-auto">
-        <div className="flex items-center gap-3 bg-cyan-500/10 border border-cyan-500/30 rounded-xl px-4 py-2 hidden md:flex">
-          <Database className="text-cyan-400" size={20} />
-          <div className="flex flex-col">
-            <span className="text-[10px] text-cyan-300 font-bold tracking-widest uppercase">Connection Status</span>
-            <span className="text-xs text-cyan-100/70 font-mono">Jessore Board Linked</span>
-          </div>
-        </div>
-
-        {(hasData || isLoading) && (
-          <button 
-            onClick={onSync}
-            disabled={isLoading}
-            className={`relative z-10 w-full md:w-auto py-3 px-6 rounded-xl text-sm font-bold transition-all shadow-[0_0_15px_rgba(16,185,129,0.2)] tracking-widest flex items-center justify-center gap-2 border ${
-              isLoading 
-                ? 'bg-emerald-500/40 border-emerald-500 text-white cursor-wait'
-                : 'bg-emerald-600/20 hover:bg-emerald-500/40 border-emerald-500/50 text-emerald-300 hover:shadow-[0_0_25px_rgba(16,185,129,0.4)]'
-            }`}
-          >
+      <div className="flex items-center justify-end gap-4 w-full md:w-auto relative z-10 mt-2 md:mt-0">
+        <div className={`flex items-center gap-3 border rounded-xl px-4 py-2 w-full md:w-auto ${isLoading ? 'bg-cyan-500/10 border-cyan-500/30 shadow-[0_0_15px_rgba(6,182,212,0.2)]' : 'bg-emerald-500/10 border-emerald-500/30 shadow-[0_0_15px_rgba(16,185,129,0.2)]'}`}>
+          <div className="relative flex h-3 w-3 shrink-0">
             {isLoading ? (
-              <>
-                <Loader2 className="w-5 h-5 animate-spin" />
-                Syncing... {Math.round(progress)}%
-              </>
+               <Loader2 className="w-4 h-4 text-cyan-400 animate-spin absolute -left-[2px] -top-[2px]" />
             ) : (
               <>
-                <DownloadCloud size={20} />
-                Sync Data
+                <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
+                <span className="relative inline-flex rounded-full h-3 w-3 bg-emerald-500"></span>
               </>
             )}
-          </button>
-        )}
+          </div>
+          <div className="flex flex-col w-full overflow-hidden">
+            <span className={`text-[9px] md:text-[10px] font-bold tracking-widest uppercase ${isLoading ? 'text-cyan-300' : 'text-emerald-300'}`}>
+              {isLoading ? 'System Status' : 'Connection Status'}
+            </span>
+            <span className={`text-[10px] md:text-xs font-mono truncate ${isLoading ? 'text-cyan-100/70' : 'text-emerald-100/70'}`}>
+              {isLoading ? loadingText : 'Jessore Board Database Connected'}
+            </span>
+          </div>
+          {isLoading && <span className="text-cyan-400 font-bold text-xs ml-2 shrink-0">{Math.round(progress)}%</span>}
+        </div>
       </div>
     </div>
   );

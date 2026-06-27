@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from 'react';
+import { ArrowUp } from 'lucide-react';
 import { StudentData } from './types';
 import StudentCard from './StudentCard';
 
@@ -13,7 +14,38 @@ interface StudentGridProps {
 export default function StudentGrid({ data, searchQuery, isHighlightMode, onStudentClick, hasData }: StudentGridProps) {
   const [cols, setCols] = useState<number>(3);
   const [highlightedRegNos, setHighlightedRegNos] = useState<string[]>([]);
-  const [visibleCount, setVisibleCount] = useState<number>(24);
+  const itemsPerLoad = typeof window !== 'undefined' && window.innerWidth < 768 ? 8 : 24;
+  const [visibleCount, setVisibleCount] = useState<number>(itemsPerLoad);
+  
+  const scrollContainerRef = React.useRef<HTMLDivElement>(null);
+  const [showScrollTop, setShowScrollTop] = useState(false);
+
+  const handleScroll = (e: React.UIEvent<HTMLDivElement>) => {
+    if (e.currentTarget.scrollTop > 500) {
+      setShowScrollTop(true);
+    } else if (window.scrollY <= 500) {
+      setShowScrollTop(false);
+    }
+  };
+
+  useEffect(() => {
+    const handleWindowScroll = () => {
+      if (window.scrollY > 500) {
+        setShowScrollTop(true);
+      } else if (!scrollContainerRef.current || scrollContainerRef.current.scrollTop <= 500) {
+        setShowScrollTop(false);
+      }
+    };
+    window.addEventListener('scroll', handleWindowScroll);
+    return () => window.removeEventListener('scroll', handleWindowScroll);
+  }, []);
+
+  const scrollToTop = () => {
+    if (scrollContainerRef.current && scrollContainerRef.current.scrollTop > 0) {
+      scrollContainerRef.current.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  };
 
   // Resize listener for mobile fallback
   useEffect(() => {
@@ -46,7 +78,7 @@ export default function StudentGrid({ data, searchQuery, isHighlightMode, onStud
         // Find first match index to ensure it's rendered
         const firstMatchIndex = data.findIndex(d => d.regNo === matchRegNos[0]);
         if (firstMatchIndex !== -1 && firstMatchIndex >= visibleCount) {
-          setVisibleCount(firstMatchIndex + 24);
+          setVisibleCount(firstMatchIndex + itemsPerLoad);
         }
       } else {
         setHighlightedRegNos([]);
@@ -75,11 +107,11 @@ export default function StudentGrid({ data, searchQuery, isHighlightMode, onStud
     if (observer.current) observer.current.disconnect();
     observer.current = new IntersectionObserver(entries => {
       if (entries[0].isIntersecting && visibleCount < data.length) {
-        setVisibleCount(prev => prev + 24);
+        setVisibleCount(prev => prev + itemsPerLoad);
       }
     });
     if (node) observer.current.observe(node);
-  }, [visibleCount, data.length]);
+  }, [visibleCount, data.length, itemsPerLoad]);
 
   const gridColsClass = cols === 1 ? 'md:grid-cols-1' : 
                         cols === 2 ? 'md:grid-cols-2' : 
@@ -88,7 +120,7 @@ export default function StudentGrid({ data, searchQuery, isHighlightMode, onStud
                         cols === 5 ? 'md:grid-cols-5' : 'md:grid-cols-6';
 
   return (
-    <div className="bg-black/60 backdrop-blur-2xl border border-blue-600/25 rounded-2xl shadow-2xl p-4 flex-grow flex flex-col overflow-hidden relative gap-4">
+    <div className="bg-[#050b14] md:bg-black/60 md:backdrop-blur-2xl border border-blue-600/25 rounded-2xl md:shadow-2xl p-3 md:p-4 flex-grow flex flex-col overflow-hidden relative gap-4">
       
       <div className="hidden md:flex justify-between items-center bg-black/40 border border-emerald-500/20 rounded-xl p-2 px-4 shrink-0 shadow-inner">
         <span className="text-[10px] text-emerald-500/60 font-bold uppercase tracking-widest">Layout View</span>
@@ -111,7 +143,11 @@ export default function StudentGrid({ data, searchQuery, isHighlightMode, onStud
         </div>
       </div>
 
-      <div className={`flex-grow overflow-y-auto pr-2 rounded-xl grid gap-4 content-start grid-cols-1 ${gridColsClass}`}>
+      <div 
+        ref={scrollContainerRef}
+        onScroll={handleScroll}
+        className={`flex-grow overflow-y-auto pr-2 rounded-xl grid gap-4 content-start grid-cols-1 ${gridColsClass}`}
+      >
         {!hasData ? (
           <div className="col-span-full h-full flex flex-col items-center justify-center text-emerald-500/30 text-sm border-2 border-dashed border-emerald-500/20 rounded-2xl min-h-[300px] bg-black/20">
             <div className="text-4xl mb-4 opacity-50">⚙️</div>
@@ -133,7 +169,7 @@ export default function StudentGrid({ data, searchQuery, isHighlightMode, onStud
                   id={`student-${student.regNo}`}
                   ref={isLast ? lastElementRef : null}
                   className="animate-slide-up opacity-0"
-                  style={{ animationDelay: `${Math.min((index % 24) * 0.05, 1)}s` }}
+                  style={{ animationDelay: `${Math.min((index % itemsPerLoad) * 0.05, 1)}s` }}
                 >
                   <StudentCard 
                     student={student} 
@@ -147,6 +183,16 @@ export default function StudentGrid({ data, searchQuery, isHighlightMode, onStud
           </>
         )}
       </div>
+
+      {showScrollTop && (
+        <button 
+          onClick={scrollToTop}
+          title="Scroll to Top"
+          className="fixed bottom-6 right-6 z-[60] bg-emerald-500/90 hover:bg-emerald-400 text-black p-3 rounded-full shadow-[0_0_20px_rgba(16,185,129,0.5)] transition-all animate-fade-in hover:scale-110 border border-emerald-300"
+        >
+          <ArrowUp size={24} />
+        </button>
+      )}
     </div>
   );
 }

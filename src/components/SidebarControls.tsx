@@ -29,7 +29,7 @@ export default function SidebarControls(props: SidebarControlsProps) {
     }`;
 
   return (
-    <div className="bg-black/60 backdrop-blur-2xl border border-blue-600/25 rounded-2xl shadow-2xl p-4 lg:p-5 flex flex-col gap-5 shrink-0 w-full lg:w-[320px] lg:overflow-y-auto sticky top-4 z-40 max-h-[90vh]">
+    <div className="bg-[#050b14] md:bg-black/60 md:backdrop-blur-2xl border border-blue-600/25 rounded-2xl md:shadow-2xl p-4 lg:p-5 flex flex-col gap-5 shrink-0 w-full lg:w-[320px] lg:overflow-y-auto sticky top-4 z-40 max-h-[90vh]">
       
       <div className="flex flex-col gap-3">
         <input 

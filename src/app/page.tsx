@@ -25,6 +25,68 @@ export default function Dashboard() {
   const [isLoadingDB, setIsLoadingDB] = useState(false);
   const [syncProgress, setSyncProgress] = useState(0);
 
+  const [isAppBooting, setIsAppBooting] = useState(true);
+  const [bootProgress, setBootProgress] = useState(0);
+
+  useEffect(() => {
+    if (!isAppBooting) return;
+    
+    let isMounted = true;
+    let currentProgress = 0;
+    let logIndex = 0;
+    
+    const fakeConsoleLogs = [
+      "[SYS] Initializing secure handshake protocols...",
+      "[NET] Bypassing localized firewall restrictions...",
+      "[AUTH] Validating RSA-2048 encryption keys...",
+      "[DB] Connecting to Jessore Board Central Node...",
+      "[DB] Connection established. Latency: 42ms",
+      "[SYS] Requesting student demographics payload...",
+      "[SYS] Awaiting server response...",
+      "[DATA] Stream initiated. Downloading chunks...",
+      "[DATA] Decrypting 256-bit encrypted payload...",
+      "[SYS] Verifying data integrity...",
+      "[SYS] Synchronization complete."
+    ];
+
+    setTimeout(console.log.bind(console, "%c[MASTER DASHBOARD BOOT SEQUENCE INITIATED]", "color: #10b981; font-weight: bold; font-size: 14px;"), 0);
+
+    const step = () => {
+      if (!isMounted) return;
+      
+      let delay = Math.random() * 250 + 100;
+      if (Math.random() > 0.75) delay += 500; // 25% chance of a longer pause for realism
+      
+      setTimeout(() => {
+        if (!isMounted) return;
+        
+        currentProgress += Math.floor(Math.random() * 12) + 2; 
+        if (currentProgress >= 100) currentProgress = 100;
+        
+        setBootProgress(currentProgress);
+        
+        // Print logs matching progress
+        const expectedLogIndex = Math.floor((currentProgress / 100) * fakeConsoleLogs.length);
+        while (logIndex <= expectedLogIndex && logIndex < fakeConsoleLogs.length) {
+           setTimeout(console.log.bind(console, `%c${fakeConsoleLogs[logIndex]}`, "color: #34d399; font-family: monospace;"), 0);
+           logIndex++;
+        }
+        
+        if (currentProgress < 100) {
+          step();
+        } else {
+          setTimeout(console.log.bind(console, "%c[SYS] System ready. Awaiting user input.", "color: #60a5fa; font-weight: bold;"), 0);
+          setTimeout(() => {
+            if (isMounted) setIsAppBooting(false);
+          }, 300);
+        }
+      }, delay);
+    };
+    
+    step();
+    return () => { isMounted = false; };
+  }, [isAppBooting]);
+
   const closeAlert = () => setAlertState(prev => ({ ...prev, isOpen: false }));
 
   const handleLoadFromDB = async () => {
@@ -199,7 +261,12 @@ export default function Dashboard() {
 
   return (
     <div className="max-w-[1400px] w-full mx-auto flex flex-col h-full lg:max-h-[95vh] gap-5 mt-4 md:mt-6 mb-4 md:mb-6 px-4 md:px-6 animate-fade-in">
-      <DatabaseSyncSection onSync={handleLoadFromDB} isLoading={isLoadingDB} progress={syncProgress} hasData={baseData.length > 0} />
+      <DatabaseSyncSection 
+        onSync={handleLoadFromDB} 
+        isLoading={isLoadingDB || isAppBooting} 
+        progress={isAppBooting ? bootProgress : syncProgress} 
+        hasData={baseData.length > 0} 
+      />
       
       {!isLoadingDB && baseData.length > 0 && (
         <div className="flex flex-col lg:flex-row gap-5 flex-grow lg:overflow-hidden animate-slide-up">
@@ -280,9 +347,14 @@ export default function Dashboard() {
             
             <button 
               onClick={handleLoadFromDB}
-              className="mt-4 w-full py-4 bg-emerald-600/20 hover:bg-emerald-500/40 border border-emerald-500/50 text-emerald-300 rounded-xl text-sm font-bold tracking-widest transition-all shadow-[0_0_15px_rgba(16,185,129,0.2)] hover:shadow-[0_0_25px_rgba(16,185,129,0.4)]"
+              disabled={isAppBooting}
+              className={`mt-4 w-full py-4 rounded-xl text-sm font-bold tracking-widest transition-all ${
+                isAppBooting 
+                  ? 'bg-emerald-600/10 border border-emerald-500/20 text-emerald-500/30 cursor-wait'
+                  : 'bg-emerald-600/20 hover:bg-emerald-500/40 border border-emerald-500/50 text-emerald-300 shadow-[0_0_15px_rgba(16,185,129,0.2)] hover:shadow-[0_0_25px_rgba(16,185,129,0.4)]'
+              }`}
             >
-              SYNC DATA
+              {isAppBooting ? `ESTABLISHING LINK... ${bootProgress}%` : 'LOAD DATA'}
             </button>
           </div>
           
