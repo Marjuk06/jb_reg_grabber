@@ -28,12 +28,12 @@ export default function DetailModal({
 
   return (
     <div 
-      className="fixed inset-0 bg-black/80 z-50 flex items-center justify-center p-4 backdrop-blur-md"
+      className="fixed inset-0 bg-black/80 z-50 flex items-center justify-center p-4 backdrop-blur-md animate-fade-in"
       onClick={(e) => {
         if (e.target === e.currentTarget) onClose();
       }}
     >
-      <div className="bg-[#111] border border-white/20 rounded-2xl w-full max-w-lg shadow-2xl overflow-hidden relative">
+      <div className="bg-[#111] border border-white/20 rounded-2xl w-full max-w-lg shadow-2xl overflow-hidden relative animate-scale-in">
         <button 
           onClick={onClose}
           className="absolute top-4 right-4 text-emerald-500/50 hover:text-emerald-400 bg-emerald-500/10 hover:bg-emerald-500/20 rounded-full w-8 h-8 flex items-center justify-center transition-all z-10 border border-emerald-500/30"

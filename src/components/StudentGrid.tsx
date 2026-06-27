@@ -98,7 +98,12 @@ export default function StudentGrid({ data, searchQuery, isHighlightMode, onStud
           </div>
         ) : (
           data.map((student, index) => (
-            <div key={student.regNo || index} id={`student-${student.regNo}`}>
+            <div 
+              key={student.regNo || index} 
+              id={`student-${student.regNo}`}
+              className="animate-slide-up opacity-0"
+              style={{ animationDelay: `${Math.min(index * 0.05, 1)}s` }}
+            >
               <StudentCard 
                 student={student} 
                 isHighlighted={student.regNo === highlightedRegNo}

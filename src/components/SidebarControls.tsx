@@ -55,8 +55,7 @@ export default function SidebarControls(props: SidebarControlsProps) {
         <span className="text-[10px] uppercase tracking-widest text-emerald-500/60 font-bold ml-1">Sort By</span>
         <div className="grid grid-cols-2 gap-2">
           <button onClick={() => props.setCurrentSort('boardRoll')} className={btnClass(props.currentSort === 'boardRoll')}>Board Roll</button>
-          <button onClick={() => props.setCurrentSort('serial')} className={btnClass(props.currentSort === 'serial')}>Seat Plan</button>
-          <button onClick={() => props.setCurrentSort('roll')} className={`col-span-2 ${btnClass(props.currentSort === 'roll')}`}>Class Roll</button>
+          <button onClick={() => props.setCurrentSort('roll')} className={btnClass(props.currentSort === 'roll')}>Class Roll</button>
         </div>
       </div>
 

@@ -1,5 +1,7 @@
-import React, { useState } from 'react';
+import React from 'react';
+import Image from 'next/image';
 import { Database, DownloadCloud, Loader2 } from 'lucide-react';
+import JBLogo from '@/assets/JB_logo.jpeg';
 
 interface DatabaseSyncSectionProps {
   onSync: () => Promise<void>;
@@ -17,11 +19,16 @@ export default function DatabaseSyncSection({ onSync, isLoading, progress }: Dat
         />
       )}
 
-      <div className="relative z-10 text-center md:text-left w-full md:w-auto">
-        <h1 className="text-2xl font-bold bg-gradient-to-r from-emerald-400 to-cyan-400 bg-clip-text text-transparent">
-          Master Student Dashboard
-        </h1>
-        <p className="text-xs text-emerald-500/70 mt-2 md:mt-1">
+      <div className="relative z-10 flex flex-col gap-2 text-left w-full md:w-auto">
+        <div className="flex flex-row items-center gap-3 md:gap-4">
+          <div className="flex-shrink-0 bg-white/5 p-1 rounded-2xl border border-emerald-500/30 shadow-[0_0_15px_rgba(16,185,129,0.2)]">
+            <Image src={JBLogo} alt="Jessore Board Logo" className="w-12 h-12 md:w-16 md:h-16 object-cover rounded-xl" />
+          </div>
+          <h1 className="text-xl md:text-2xl font-bold bg-gradient-to-r from-emerald-400 to-cyan-400 bg-clip-text text-transparent leading-tight">
+            Master Student<br className="md:hidden" /> Dashboard
+          </h1>
+        </div>
+        <p className="text-[11px] md:text-xs text-emerald-500/70">
           Viewing live data synchronized from Jessore Board Central Database.
         </p>
       </div>

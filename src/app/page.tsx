@@ -64,12 +64,18 @@ export default function Dashboard() {
             image: d.image_url || ''
           }));
           
-          setBaseData(mappedData);
+          const validData = mappedData.filter(d => 
+            !d.type.toLowerCase().includes('irregular') && 
+            !d.type.toLowerCase().includes('improvement') && 
+            !d.type.toLowerCase().includes('private')
+          );
+          
+          setBaseData(validData);
           setAlertState({
             isOpen: true,
             type: 'success',
             title: 'Sync Successful',
-            message: `Successfully loaded ${mappedData.length} records from Jessore Board Central Database!`
+            message: `Successfully loaded ${validData.length} records from Jessore Board Central Database!`
           });
         } else {
           setBaseData([]);
@@ -101,12 +107,6 @@ export default function Dashboard() {
 
   const filteredData = useMemo(() => {
     let filtered = [...baseData];
-
-    filtered = filtered.filter(d => 
-      !d.type.toLowerCase().includes('irregular') && 
-      !d.type.toLowerCase().includes('improvement') && 
-      !d.type.toLowerCase().includes('private')
-    );
 
     if (genderFilter) {
       filtered = filtered.filter(d => d.gender.toLowerCase() === genderFilter.toLowerCase());
@@ -188,11 +188,11 @@ export default function Dashboard() {
   };
 
   return (
-    <div className="max-w-[1400px] w-full mx-auto flex flex-col h-full lg:max-h-[95vh] gap-5 mt-4 md:mt-6 mb-4 md:mb-6 px-4 md:px-6">
+    <div className="max-w-[1400px] w-full mx-auto flex flex-col h-full lg:max-h-[95vh] gap-5 mt-4 md:mt-6 mb-4 md:mb-6 px-4 md:px-6 animate-fade-in">
       <DatabaseSyncSection onSync={handleLoadFromDB} isLoading={isLoadingDB} progress={syncProgress} />
       
       {!isLoadingDB && baseData.length > 0 && (
-        <div className="flex flex-col lg:flex-row gap-5 flex-grow lg:overflow-hidden animate-in fade-in slide-in-from-bottom-4 duration-700">
+        <div className="flex flex-col lg:flex-row gap-5 flex-grow lg:overflow-hidden animate-slide-up">
         <SidebarControls 
           searchQuery={searchQuery}
           setSearchQuery={setSearchQuery}
@@ -222,7 +222,7 @@ export default function Dashboard() {
       )}
       
       {!isLoadingDB && baseData.length === 0 && (
-        <div className="flex-grow flex flex-col items-center justify-center border border-dashed border-cyan-800 rounded-2xl bg-black/40 m-4 lg:m-0 py-16 px-4 animate-in fade-in duration-700">
+        <div className="flex-grow flex flex-col items-center justify-center border border-dashed border-cyan-800 rounded-2xl bg-black/40 m-4 lg:m-0 py-16 px-4 animate-scale-in">
           <Database className="text-cyan-900 w-16 h-16 mb-4" />
           <p className="text-cyan-700 font-bold tracking-widest uppercase text-center">No Data Loaded</p>
           <p className="text-cyan-800 text-sm mt-2 text-center max-w-sm">
