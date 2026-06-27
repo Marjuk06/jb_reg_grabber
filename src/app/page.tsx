@@ -28,6 +28,16 @@ export default function Dashboard() {
   const closeAlert = () => setAlertState(prev => ({ ...prev, isOpen: false }));
 
   const handleLoadFromDB = async () => {
+    if (!groupFilter || !genderFilter) {
+      setAlertState({
+        isOpen: true,
+        type: 'info',
+        title: 'Configuration Required',
+        message: 'Please select both a Group and Gender to initialize the sync.'
+      });
+      return;
+    }
+
     setIsLoadingDB(true);
     setSyncProgress(0);
     setBaseData([]);
@@ -189,7 +199,7 @@ export default function Dashboard() {
 
   return (
     <div className="max-w-[1400px] w-full mx-auto flex flex-col h-full lg:max-h-[95vh] gap-5 mt-4 md:mt-6 mb-4 md:mb-6 px-4 md:px-6 animate-fade-in">
-      <DatabaseSyncSection onSync={handleLoadFromDB} isLoading={isLoadingDB} progress={syncProgress} />
+      <DatabaseSyncSection onSync={handleLoadFromDB} isLoading={isLoadingDB} progress={syncProgress} hasData={baseData.length > 0} />
       
       {!isLoadingDB && baseData.length > 0 && (
         <div className="flex flex-col lg:flex-row gap-5 flex-grow lg:overflow-hidden animate-slide-up">
@@ -222,12 +232,60 @@ export default function Dashboard() {
       )}
       
       {!isLoadingDB && baseData.length === 0 && (
-        <div className="flex-grow flex flex-col items-center justify-center border border-dashed border-cyan-800 rounded-2xl bg-black/40 m-4 lg:m-0 py-16 px-4 animate-scale-in">
-          <Database className="text-cyan-900 w-16 h-16 mb-4" />
-          <p className="text-cyan-700 font-bold tracking-widest uppercase text-center">No Data Loaded</p>
-          <p className="text-cyan-800 text-sm mt-2 text-center max-w-sm">
-            Click "Sync from Database" to fetch records from the central server.
-          </p>
+        <div className="flex-grow flex flex-col items-center justify-center border border-dashed border-emerald-800/30 rounded-2xl bg-black/20 m-4 lg:m-0 py-12 px-4 animate-scale-in gap-8">
+          
+          <div className="text-center">
+            <h2 className="text-2xl font-bold text-white mb-2">Initial Setup</h2>
+            <p className="text-emerald-500/70 text-sm max-w-md">Select your target demographics before initializing the central database synchronization.</p>
+          </div>
+
+          <div className="flex flex-col gap-6 w-full max-w-md bg-black/40 p-6 rounded-2xl border border-white/10 shadow-xl">
+            <div className="flex flex-col gap-3">
+              <span className="text-xs uppercase tracking-widest text-emerald-500/60 font-bold">1. Select Group</span>
+              <div className="grid grid-cols-3 gap-2">
+                {['Science', 'Humanities', 'Business'].map(g => (
+                  <button 
+                    key={g}
+                    onClick={() => setGroupFilter(g as GroupFilter)} 
+                    className={`py-3 text-[11px] font-bold rounded-xl border transition-all ${
+                      groupFilter === g 
+                        ? 'bg-emerald-500/25 border-emerald-500 text-white shadow-[0_0_15px_rgba(16,185,129,0.2)]'
+                        : 'bg-white/5 border-white/10 text-gray-400 hover:bg-white/10'
+                    }`}
+                  >
+                    {g}
+                  </button>
+                ))}
+              </div>
+            </div>
+
+            <div className="flex flex-col gap-3">
+              <span className="text-xs uppercase tracking-widest text-emerald-500/60 font-bold">2. Select Gender</span>
+              <div className="grid grid-cols-2 gap-2">
+                {['Male', 'Female'].map(g => (
+                  <button 
+                    key={g}
+                    onClick={() => setGenderFilter(g as GenderFilter)} 
+                    className={`py-3 text-[11px] font-bold rounded-xl border transition-all ${
+                      genderFilter === g 
+                        ? 'bg-emerald-500/25 border-emerald-500 text-white shadow-[0_0_15px_rgba(16,185,129,0.2)]'
+                        : 'bg-white/5 border-white/10 text-gray-400 hover:bg-white/10'
+                    }`}
+                  >
+                    {g}
+                  </button>
+                ))}
+              </div>
+            </div>
+            
+            <button 
+              onClick={handleLoadFromDB}
+              className="mt-4 w-full py-4 bg-emerald-600/20 hover:bg-emerald-500/40 border border-emerald-500/50 text-emerald-300 rounded-xl text-sm font-bold tracking-widest transition-all shadow-[0_0_15px_rgba(16,185,129,0.2)] hover:shadow-[0_0_25px_rgba(16,185,129,0.4)]"
+            >
+              SYNC DATA
+            </button>
+          </div>
+          
         </div>
       )}
 

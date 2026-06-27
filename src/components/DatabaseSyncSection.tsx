@@ -7,9 +7,10 @@ interface DatabaseSyncSectionProps {
   onSync: () => Promise<void>;
   isLoading: boolean;
   progress: number;
+  hasData: boolean;
 }
 
-export default function DatabaseSyncSection({ onSync, isLoading, progress }: DatabaseSyncSectionProps) {
+export default function DatabaseSyncSection({ onSync, isLoading, progress, hasData }: DatabaseSyncSectionProps) {
   return (
     <div className="bg-black/60 backdrop-blur-2xl border border-blue-600/25 rounded-2xl shadow-2xl p-5 flex flex-col md:flex-row gap-4 shrink-0 justify-between items-center relative overflow-hidden">
       {isLoading && (
@@ -42,27 +43,29 @@ export default function DatabaseSyncSection({ onSync, isLoading, progress }: Dat
           </div>
         </div>
 
-        <button 
-          onClick={onSync}
-          disabled={isLoading}
-          className={`relative z-10 w-full md:w-auto py-3 px-6 rounded-xl text-sm font-bold transition-all shadow-[0_0_15px_rgba(16,185,129,0.2)] tracking-widest flex items-center justify-center gap-2 border ${
-            isLoading 
-              ? 'bg-emerald-500/40 border-emerald-500 text-white cursor-wait'
-              : 'bg-emerald-600/20 hover:bg-emerald-500/40 border-emerald-500/50 text-emerald-300 hover:shadow-[0_0_25px_rgba(16,185,129,0.4)]'
-          }`}
-        >
-          {isLoading ? (
-            <>
-              <Loader2 className="w-5 h-5 animate-spin" />
-              Syncing... {Math.round(progress)}%
-            </>
-          ) : (
-            <>
-              <DownloadCloud size={20} />
-              Sync from Database
-            </>
-          )}
-        </button>
+        {(hasData || isLoading) && (
+          <button 
+            onClick={onSync}
+            disabled={isLoading}
+            className={`relative z-10 w-full md:w-auto py-3 px-6 rounded-xl text-sm font-bold transition-all shadow-[0_0_15px_rgba(16,185,129,0.2)] tracking-widest flex items-center justify-center gap-2 border ${
+              isLoading 
+                ? 'bg-emerald-500/40 border-emerald-500 text-white cursor-wait'
+                : 'bg-emerald-600/20 hover:bg-emerald-500/40 border-emerald-500/50 text-emerald-300 hover:shadow-[0_0_25px_rgba(16,185,129,0.4)]'
+            }`}
+          >
+            {isLoading ? (
+              <>
+                <Loader2 className="w-5 h-5 animate-spin" />
+                Syncing... {Math.round(progress)}%
+              </>
+            ) : (
+              <>
+                <DownloadCloud size={20} />
+                Sync Data
+              </>
+            )}
+          </button>
+        )}
       </div>
     </div>
   );
