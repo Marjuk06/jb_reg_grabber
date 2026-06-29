@@ -1,5 +1,6 @@
 import React from 'react';
 import { StudentData } from './types';
+import { getSeatInfo } from '../lib/seatPlan';
 
 interface StudentCardProps {
   student: StudentData;
@@ -47,10 +48,15 @@ export default function StudentCard({ student, isHighlighted, onClick, cardRef }
             <span className="font-bold text-white text-[13px] truncate tracking-wide" title={student.name}>
               {student.name}
             </span>
-            <div className="flex gap-2 items-center mt-1">
+            <div className="flex flex-wrap gap-1 items-center mt-1">
               <span className={`text-[10px] px-2 py-0.5 rounded border ${student.boardRoll ? 'bg-cyan-500/20 text-cyan-300 border-cyan-500/30' : 'bg-white/5 border-white/10 text-white/40'}`}>
                 BR: {student.boardRoll || 'N/A'}
               </span>
+              {getSeatInfo(student.boardRoll) && (
+                <span className="text-[10px] px-2 py-0.5 rounded border bg-amber-500/20 text-amber-300 border-amber-500/30">
+                  Room: {getSeatInfo(student.boardRoll)?.room}
+                </span>
+              )}
             </div>
           </div>
         </div>

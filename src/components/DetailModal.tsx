@@ -1,5 +1,6 @@
-import React from 'react';
+import React, { useRef } from 'react';
 import { StudentData } from './types';
+import { getSeatInfo } from '../lib/seatPlan';
 
 interface DetailModalProps {
   isOpen: boolean;
@@ -24,6 +25,8 @@ export default function DetailModal({
   if (!isOpen || !student) return null;
 
   const fallbackImg = "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='40' height='40' viewBox='0 0 24 24' fill='none' stroke='rgba(16,185,129,0.4)' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2'/%3E%3Ccircle cx='12' cy='7' r='4'/%3E%3C/svg%3E";
+  const modalRef = useRef<HTMLDivElement>(null);
+  const seatInfo = getSeatInfo(student.boardRoll);
   const imgSrc = student.image || fallbackImg;
 
   return (
@@ -66,7 +69,16 @@ export default function DetailModal({
             <div className="font-mono font-bold text-purple-400">{student.classRoll || '-'}</div>
             
             <div className="text-white/40 text-xs uppercase tracking-wider font-bold">Seat Plan:</div>
-            <div className="font-mono font-bold text-blue-400">{student.serialNum || '-'}</div>
+            <div className="font-bold text-blue-400">
+              {seatInfo ? (
+                <div className="flex flex-col gap-1 text-[13px]">
+                  <span>{seatInfo.center}</span>
+                  <span className="text-blue-300">{seatInfo.building}, Floor: {seatInfo.floor}, <span className="text-emerald-400 border border-emerald-500/30 px-1 py-0.5 rounded bg-emerald-500/10">Room: {seatInfo.room}</span></span>
+                </div>
+              ) : (
+                'Not Assigned'
+              )}
+            </div>
             
             <div className="text-white/40 text-xs uppercase tracking-wider font-bold">Group:</div>
             <div className="font-bold text-yellow-300">{student.group}</div>
@@ -79,6 +91,13 @@ export default function DetailModal({
             <div className="text-white/40 text-xs uppercase tracking-wider font-bold">Student Type:</div>
             <div className="font-bold text-gray-200">{student.type}</div>
           </div>
+          
+          {seatInfo && (
+            <div className="mt-6 p-3 rounded-xl bg-amber-500/10 border border-amber-500/20 text-amber-500/80 text-[11px] leading-relaxed">
+              <strong>Notice:</strong> This seat plan is for <strong>ALL STUDENTS</strong> but ONLY applies to the following 5 exams:<br/>
+              Bangla 1st & 2nd Paper, English 1st & 2nd Paper, and ICT.
+            </div>
+          )}
         </div>
 
         <div className="bg-black/40 border-t border-emerald-500/20 p-4 flex justify-between items-center">
