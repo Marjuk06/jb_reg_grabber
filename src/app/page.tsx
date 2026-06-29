@@ -114,19 +114,38 @@ export default function Dashboard() {
     }, 200);
     
     try {
-      const { data, error } = await supabase
-        .from('students')
-        .select('*')
-        .order('board_roll', { ascending: true });
+      let allData: any[] = [];
+      let page = 0;
+      const pageSize = 1000;
+      let fetchMore = true;
 
-      if (error) throw error;
+      while (fetchMore) {
+        const { data, error } = await supabase
+          .from('students')
+          .select('*')
+          .order('board_roll', { ascending: true })
+          .range(page * pageSize, (page + 1) * pageSize - 1);
+
+        if (error) throw error;
+
+        if (data && data.length > 0) {
+          allData = [...allData, ...data];
+          if (data.length < pageSize) {
+            fetchMore = false;
+          } else {
+            page++;
+          }
+        } else {
+          fetchMore = false;
+        }
+      }
       
       clearInterval(progressInterval);
       setSyncProgress(100);
 
       setTimeout(() => {
-        if (data && data.length > 0) {
-          const mappedData: StudentData[] = data.map(d => ({
+        if (allData.length > 0) {
+          const mappedData: StudentData[] = allData.map(d => ({
             regNo: d.reg_no || '',
             name: d.name || 'Unknown',
             boardRoll: d.board_roll || '',
