@@ -23,9 +23,51 @@ export default function Dashboard() {
   
   const [modalOpen, setModalOpen] = useState(false);
   const [currentStudentIndex, setCurrentStudentIndex] = useState(-1);
+  const [targetedStudentId, setTargetedStudentId] = useState<string | null>(null);
   const [alertState, setAlertState] = useState<AlertState>({ isOpen: false, type: 'info', title: '', message: '' });
   const [isLoadingDB, setIsLoadingDB] = useState(false);
   const [syncProgress, setSyncProgress] = useState(0);
+
+  // Sync state from URL on mount
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      const params = new URLSearchParams(window.location.search);
+      if (params.has('q')) setSearchQuery(params.get('q') || '');
+      if (params.has('sort')) setCurrentSort(params.get('sort') as SortMode);
+      if (params.has('gender')) setGenderFilter(params.get('gender') as GenderFilter);
+      if (params.has('group')) setGroupFilter(params.get('group') as GroupFilter);
+      if (params.has('room')) setRoomFilter(params.get('room') as RoomFilter);
+      if (params.has('student')) setTargetedStudentId(params.get('student'));
+    }
+  }, []);
+
+  // Sync state to URL on change
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      const params = new URLSearchParams(window.location.search);
+      
+      if (searchQuery) params.set('q', searchQuery);
+      else params.delete('q');
+      
+      if (currentSort && currentSort !== 'boardRoll') params.set('sort', currentSort);
+      else params.delete('sort');
+      
+      if (genderFilter) params.set('gender', genderFilter);
+      else params.delete('gender');
+      
+      if (groupFilter) params.set('group', groupFilter);
+      else params.delete('group');
+      
+      if (roomFilter) params.set('room', roomFilter);
+      else params.delete('room');
+      
+      if (targetedStudentId) params.set('student', targetedStudentId);
+      else params.delete('student');
+
+      const newUrl = `${window.location.pathname}${params.toString() ? '?' + params.toString() : ''}`;
+      window.history.replaceState({}, '', newUrl);
+    }
+  }, [searchQuery, currentSort, genderFilter, groupFilter, roomFilter, targetedStudentId]);
 
   const [isAppBooting, setIsAppBooting] = useState(true);
   const [bootProgress, setBootProgress] = useState(0);
@@ -91,18 +133,7 @@ export default function Dashboard() {
 
   const closeAlert = () => setAlertState(prev => ({ ...prev, isOpen: false }));
 
-  const handleLoadFromDB = async () => {
-    if (!groupFilter || !genderFilter) {
-      setAlertState({
-        isOpen: true,
-        type: 'info',
-        title: 'Configuration Required',
-        message: 'Please select both a Group and Gender to initialize the sync.'
-      });
-      return;
-    }
-
-    setIsLoadingDB(true);
+  const handleLoadFromDB = async () => {    setIsLoadingDB(true);
     setSyncProgress(0);
     setBaseData([]);
     
@@ -360,8 +391,10 @@ export default function Dashboard() {
             data={displayData} 
             searchQuery={searchQuery}
             isHighlightMode={true}
+            targetStudentId={targetedStudentId}
             onStudentClick={(idx) => {
               setCurrentStudentIndex(idx);
+              setTargetedStudentId(displayData[idx].boardRoll);
               setModalOpen(true);
             }}
             hasData={baseData.length > 0}
@@ -435,12 +468,23 @@ export default function Dashboard() {
 
       <DetailModal 
         isOpen={modalOpen}
-        onClose={() => setModalOpen(false)}
+        onClose={() => {
+          setModalOpen(false);
+          setTargetedStudentId(null);
+        }}
         student={displayData[currentStudentIndex] || null}
         currentIndex={currentStudentIndex}
         totalRecords={displayData.length}
-        onPrev={() => setCurrentStudentIndex(prev => Math.max(0, prev - 1))}
-        onNext={() => setCurrentStudentIndex(prev => Math.min(displayData.length - 1, prev + 1))}
+        onPrev={() => {
+          const newIdx = Math.max(0, currentStudentIndex - 1);
+          setCurrentStudentIndex(newIdx);
+          setTargetedStudentId(displayData[newIdx]?.boardRoll || null);
+        }}
+        onNext={() => {
+          const newIdx = Math.min(displayData.length - 1, currentStudentIndex + 1);
+          setCurrentStudentIndex(newIdx);
+          setTargetedStudentId(displayData[newIdx]?.boardRoll || null);
+        }}
       />
 
       <CustomAlert 

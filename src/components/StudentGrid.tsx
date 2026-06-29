@@ -8,11 +8,12 @@ interface StudentGridProps {
   data: StudentData[];
   searchQuery: string;
   isHighlightMode: boolean;
+  targetStudentId?: string | null;
   onStudentClick: (index: number) => void;
   hasData: boolean;
 }
 
-export default function StudentGrid({ data, searchQuery, isHighlightMode, onStudentClick, hasData }: StudentGridProps) {
+export default function StudentGrid({ data, searchQuery, isHighlightMode, targetStudentId, onStudentClick, hasData }: StudentGridProps) {
   const [cols, setCols] = useState<number>(3);
   const [highlightedRegNos, setHighlightedRegNos] = useState<string[]>([]);
   
@@ -27,6 +28,17 @@ export default function StudentGrid({ data, searchQuery, isHighlightMode, onStud
       setShowScrollTop(false);
     }
   };
+
+  useEffect(() => {
+    if (targetStudentId) {
+      setTimeout(() => {
+        const el = document.getElementById(`student-${targetStudentId}`);
+        if (el) {
+          el.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        }
+      }, 300); // Wait for rendering/animation to stabilize
+    }
+  }, [targetStudentId, data]);
 
   useEffect(() => {
     const handleWindowScroll = () => {
@@ -150,16 +162,17 @@ export default function StudentGrid({ data, searchQuery, isHighlightMode, onStud
         ) : (
           <>
             {data.map((student, index) => {
+              const isTargeted = targetStudentId === student.boardRoll;
               return (
                 <div 
                   key={student.regNo || index} 
-                  id={`student-${student.regNo}`}
+                  id={`student-${student.boardRoll}`}
                   className="animate-slide-up opacity-0"
-                  style={{ animationDelay: `${Math.min((index % 24) * 0.05, 1)}s` }}
+                  style={{ animationDelay: `${Math.min((index % 24) * 0.05, 1)}s`, animationFillMode: 'forwards' }}
                 >
                   <StudentCard 
                     student={student} 
-                    isHighlighted={highlightedRegNos.includes(student.regNo)}
+                    isHighlighted={highlightedRegNos.includes(student.regNo) || isTargeted}
                     onClick={() => onStudentClick(index)}
                     cardRef={() => {}}
                   />
