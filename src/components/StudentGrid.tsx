@@ -30,13 +30,24 @@ export default function StudentGrid({ data, searchQuery, isHighlightMode, target
   };
 
   useEffect(() => {
-    if (targetStudentId) {
-      setTimeout(() => {
+    if (targetStudentId && data.length > 0) {
+      let attempts = 0;
+      const interval = setInterval(() => {
         const el = document.getElementById(`student-${targetStudentId}`);
-        if (el) {
-          el.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        const container = scrollContainerRef.current;
+        
+        if (el && container) {
+          const containerRect = container.getBoundingClientRect();
+          const elRect = el.getBoundingClientRect();
+          
+          const targetScrollTop = container.scrollTop + (elRect.top - containerRect.top) - (containerRect.height / 2) + (elRect.height / 2);
+          
+          container.scrollTo({ top: targetScrollTop, behavior: 'smooth' });
+          clearInterval(interval);
         }
-      }, 300); // Wait for rendering/animation to stabilize
+        if (attempts++ > 30) clearInterval(interval); // Give up after 3s
+      }, 100);
+      return () => clearInterval(interval);
     }
   }, [targetStudentId, data]);
 
@@ -92,6 +103,16 @@ export default function StudentGrid({ data, searchQuery, isHighlightMode, target
         const matchRegNos = matches.map(m => m.regNo);
         setHighlightedRegNos(matchRegNos);
         
+        setTimeout(() => {
+          const el = document.getElementById(`student-${matches[0].boardRoll}`);
+          const container = scrollContainerRef.current;
+          if (el && container) {
+            const containerRect = container.getBoundingClientRect();
+            const elRect = el.getBoundingClientRect();
+            const targetScrollTop = container.scrollTop + (elRect.top - containerRect.top) - (containerRect.height / 2) + (elRect.height / 2);
+            container.scrollTo({ top: targetScrollTop, behavior: 'smooth' });
+          }
+        }, 150);
       } else {
         setHighlightedRegNos([]);
       }

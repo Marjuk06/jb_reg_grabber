@@ -195,12 +195,6 @@ export default function Dashboard() {
           );
           
           setBaseData(validData);
-          setAlertState({
-            isOpen: true,
-            type: 'success',
-            title: 'Sync Successful',
-            message: `Successfully loaded ${validData.length} records from Jessore Board Central Database!`
-          });
         } else {
           setBaseData([]);
           setAlertState({
@@ -351,7 +345,10 @@ export default function Dashboard() {
         <div className="flex flex-col lg:flex-row gap-5 flex-grow lg:overflow-hidden animate-slide-up">
         <SidebarControls 
           searchQuery={searchQuery}
-          setSearchQuery={setSearchQuery}
+          setSearchQuery={(q) => {
+            setSearchQuery(q);
+            if (q) setTargetedStudentId(null);
+          }}
           currentSort={currentSort}
           setCurrentSort={setCurrentSort}
           genderFilter={genderFilter}
