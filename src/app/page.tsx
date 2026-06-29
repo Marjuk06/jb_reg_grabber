@@ -336,7 +336,7 @@ export default function Dashboard() {
         />
         
         <div className="flex flex-col gap-3 flex-grow lg:overflow-hidden">
-          <div className="flex items-center gap-2 overflow-x-auto hide-scrollbar pb-1 px-1">
+          <div className="flex items-center gap-2 overflow-x-auto hide-scrollbar pb-2 px-1 shrink-0 min-h-[36px]">
             <span className="text-[10px] uppercase tracking-widest text-emerald-500/60 font-bold shrink-0">Room:</span>
             {ROOM_MAPPINGS.map(rm => {
               const active = roomFilter === rm.id;
