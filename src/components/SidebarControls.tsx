@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
-import { SortMode, GenderFilter, GroupFilter } from './types';
+import { SortMode, GenderFilter, GroupFilter, RoomFilter } from './types';
+import { ROOM_MAPPINGS } from '../lib/seatPlan';
 
 import { Loader2, ChevronDown, ChevronUp } from 'lucide-react';
 
@@ -12,6 +13,8 @@ interface SidebarControlsProps {
   setGenderFilter: (g: GenderFilter) => void;
   groupFilter: GroupFilter;
   setGroupFilter: (g: GroupFilter) => void;
+  roomFilter: RoomFilter;
+  setRoomFilter: (r: RoomFilter) => void;
   recordCount: number;
   onExport: () => void;
   onReset: () => void;

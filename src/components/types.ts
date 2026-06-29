@@ -13,3 +13,4 @@ export interface StudentData {
 export type SortMode = 'boardRoll' | 'serial' | 'roll';
 export type GenderFilter = 'Female' | 'Male' | null;
 export type GroupFilter = 'Science' | 'Humanities' | 'Business' | null;
+export type RoomFilter = string | null;

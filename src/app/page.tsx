@@ -7,7 +7,8 @@ import SidebarControls from '@/components/SidebarControls';
 import StudentGrid from '@/components/StudentGrid';
 import DetailModal from '@/components/DetailModal';
 import CustomAlert, { AlertState } from '@/components/CustomAlert';
-import { StudentData, SortMode, GenderFilter, GroupFilter } from '@/components/types';
+import { StudentData, SortMode, GenderFilter, GroupFilter, RoomFilter } from '@/components/types';
+import { ROOM_MAPPINGS, getSeatInfo } from '@/lib/seatPlan';
 
 import { supabase } from '@/lib/supabaseClient';
 
@@ -18,6 +19,7 @@ export default function Dashboard() {
   const [currentSort, setCurrentSort] = useState<SortMode>('boardRoll');
   const [genderFilter, setGenderFilter] = useState<GenderFilter>(null);
   const [groupFilter, setGroupFilter] = useState<GroupFilter>(null);
+  const [roomFilter, setRoomFilter] = useState<RoomFilter>(null);
   
   const [modalOpen, setModalOpen] = useState(false);
   const [currentStudentIndex, setCurrentStudentIndex] = useState(-1);
@@ -177,6 +179,10 @@ export default function Dashboard() {
 
 
 
+  const handleRoomFilterChange = (newFilter: RoomFilter) => {
+    setRoomFilter(newFilter);
+  };
+
   const filteredData = useMemo(() => {
     let filtered = [...baseData];
 
@@ -190,6 +196,15 @@ export default function Dashboard() {
         return grp.includes(groupFilter.toLowerCase()) || 
                (groupFilter === 'Humanities' && grp.includes('arts')) || 
                (groupFilter === 'Business' && grp.includes('commerce'));
+      });
+    }
+
+    if (roomFilter) {
+      filtered = filtered.filter(d => {
+        const seatInfo = getSeatInfo(d.boardRoll);
+        if (!seatInfo) return false;
+        const seatId = `${seatInfo.room}-${seatInfo.isMainCenter ? 'main' : 'sub'}`;
+        return seatId === roomFilter;
       });
     }
 
@@ -222,7 +237,21 @@ export default function Dashboard() {
     }
 
     return filtered;
-  }, [baseData, genderFilter, groupFilter, currentSort]);
+  }, [baseData, genderFilter, groupFilter, roomFilter, currentSort]);
+
+  useEffect(() => {
+    if (roomFilter && filteredData.length === 0) {
+      const rm = ROOM_MAPPINGS.find(r => r.id === roomFilter);
+      if (rm) {
+        setAlertState({
+          isOpen: true,
+          type: 'info',
+          title: `Room ${rm.label} - No Match`,
+          message: `Room ${rm.label} (${rm.center}) is allocated for ${rm.group} (Roll: ${rm.rollRange}). Your current filters or database don't contain these students. Please choose another room or upload the specific roll range to see the required students.`
+        });
+      }
+    }
+  }, [roomFilter, filteredData.length]);
 
   const displayData = filteredData;
 
@@ -279,22 +308,46 @@ export default function Dashboard() {
           setGenderFilter={setGenderFilter}
           groupFilter={groupFilter}
           setGroupFilter={setGroupFilter}
+          roomFilter={roomFilter}
+          setRoomFilter={handleRoomFilterChange}
           recordCount={displayData.length}
           onExport={handleExport}
           onReset={handleReset}
           hasData={baseData.length > 0}
         />
         
-        <StudentGrid 
-          data={displayData} 
-          searchQuery={searchQuery}
-          isHighlightMode={true}
-          onStudentClick={(idx) => {
-            setCurrentStudentIndex(idx);
-            setModalOpen(true);
-          }}
-          hasData={baseData.length > 0}
-        />
+        <div className="flex flex-col gap-3 flex-grow lg:overflow-hidden">
+          <div className="flex items-center gap-2 overflow-x-auto hide-scrollbar pb-1 px-1">
+            <span className="text-[10px] uppercase tracking-widest text-emerald-500/60 font-bold shrink-0">Room:</span>
+            {ROOM_MAPPINGS.map(rm => {
+              const active = roomFilter === rm.id;
+              return (
+                <button 
+                  key={rm.id} 
+                  onClick={() => handleRoomFilterChange(active ? null : rm.id)} 
+                  className={`px-4 py-1.5 text-[11px] font-bold rounded-full border transition-all shrink-0 ${
+                    active 
+                      ? 'bg-amber-500/25 border-amber-500 text-amber-300 shadow-[0_0_15px_rgba(245,158,11,0.2)]'
+                      : 'bg-emerald-500/5 border-emerald-500/20 hover:bg-emerald-500/15 hover:border-emerald-500/40 text-emerald-400'
+                  }`}
+                  title={`${rm.group} | ${rm.rollRange}`}
+                >
+                  {rm.label}
+                </button>
+              );
+            })}
+          </div>
+          <StudentGrid 
+            data={displayData} 
+            searchQuery={searchQuery}
+            isHighlightMode={true}
+            onStudentClick={(idx) => {
+              setCurrentStudentIndex(idx);
+              setModalOpen(true);
+            }}
+            hasData={baseData.length > 0}
+          />
+        </div>
       </div>
       )}
       

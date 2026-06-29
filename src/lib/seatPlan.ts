@@ -6,6 +6,35 @@ export interface SeatInfo {
   isMainCenter: boolean;
 }
 
+export interface RoomMapping {
+  id: string;
+  room: string;
+  label: string;
+  center: string;
+  group: string;
+  rollRange: string;
+}
+
+export const ROOM_MAPPINGS: RoomMapping[] = [
+  { id: '301-main', room: '301', label: '301', center: "Govt. Pioneer Women's College", group: 'Science', rollRange: '511454 - 511527' },
+  { id: '302-main', room: '302', label: '302', center: "Govt. Pioneer Women's College", group: 'Science', rollRange: '511528 - 511601' },
+  { id: '304-main', room: '304', label: '304', center: "Govt. Pioneer Women's College", group: 'Science', rollRange: '511602-659, 511796-850' },
+  { id: '201-main', room: '201', label: '201', center: "Govt. Pioneer Women's College", group: 'Science', rollRange: '511660 - 511725' },
+  { id: '202-main', room: '202', label: '202', center: "Govt. Pioneer Women's College", group: 'Science', rollRange: '511726 - 511795' },
+  { id: 'Biology-main', room: 'Biology', label: 'Biology', center: "Govt. Pioneer Women's College", group: 'Humanities', rollRange: '641703 - 641730' },
+  { id: '108-main', room: '108', label: '108', center: "Govt. Pioneer Women's College", group: 'Hum & Bus', rollRange: '641690-702, 806965-995' },
+  { id: '106-main', room: '106', label: '106', center: "Govt. Pioneer Women's College", group: 'Humanities', rollRange: '641574 - 641631' },
+  { id: '107-main', room: '107', label: '107', center: "Govt. Pioneer Women's College", group: 'Humanities', rollRange: '641632 - 641689' },
+  { id: '306-main', room: '306', label: '306', center: "Govt. Pioneer Women's College", group: 'Business', rollRange: '806634 - 806691' },
+  { id: '307-main', room: '307', label: '307', center: "Govt. Pioneer Women's College", group: 'Business', rollRange: '806692 - 806751' },
+  { id: '308-main', room: '308', label: '308', center: "Govt. Pioneer Women's College", group: 'Business', rollRange: '806752 - 806797' },
+  { id: '206-main', room: '206', label: '206', center: "Govt. Pioneer Women's College", group: 'Business', rollRange: '806798 - 806858' },
+  { id: '207-main', room: '207', label: '207', center: "Govt. Pioneer Women's College", group: 'Business', rollRange: '806859 - 806918' },
+  { id: '208-main', room: '208', label: '208', center: "Govt. Pioneer Women's College", group: 'Business', rollRange: '806919 - 806964' },
+  { id: '201-sub', room: '201', label: '201 (AK)', center: "Azam Khan Commerce College", group: 'Humanities (Male)', rollRange: '641731 - 641800' },
+  { id: '203-sub', room: '203', label: '203 (AK)', center: "Azam Khan Commerce College", group: 'Humanities (Male)', rollRange: '641801 - 641873' },
+];
+
 export function getSeatInfo(boardRollStr: string | null | undefined): SeatInfo | null {
   if (!boardRollStr) return null;
   const roll = parseInt(boardRollStr, 10);
