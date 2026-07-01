@@ -37,12 +37,8 @@ export default function StudentGrid({ data, searchQuery, isHighlightMode, target
         const container = scrollContainerRef.current;
         
         if (el && container) {
-          const containerRect = container.getBoundingClientRect();
-          const elRect = el.getBoundingClientRect();
-          
-          const targetScrollTop = container.scrollTop + (elRect.top - containerRect.top) - (containerRect.height / 2) + (elRect.height / 2);
-          
-          container.scrollTo({ top: targetScrollTop, behavior: 'smooth' });
+          // Use scrollIntoView which naturally handles both container and window scrolling
+          el.scrollIntoView({ behavior: 'smooth', block: 'center' });
           clearInterval(interval);
         }
         if (attempts++ > 30) clearInterval(interval); // Give up after 3s
@@ -107,10 +103,7 @@ export default function StudentGrid({ data, searchQuery, isHighlightMode, target
           const el = document.getElementById(`student-${matches[0].boardRoll}`);
           const container = scrollContainerRef.current;
           if (el && container) {
-            const containerRect = container.getBoundingClientRect();
-            const elRect = el.getBoundingClientRect();
-            const targetScrollTop = container.scrollTop + (elRect.top - containerRect.top) - (containerRect.height / 2) + (elRect.height / 2);
-            container.scrollTo({ top: targetScrollTop, behavior: 'smooth' });
+            el.scrollIntoView({ behavior: 'smooth', block: 'center' });
           }
         }, 150);
       } else {
